@@ -86,7 +86,7 @@ WavpackContext *WavpackOpenFileOutput (WavpackBlockOutput blockout, void *wv_id,
 
     if (wvc_id) {
         wpc->stream.block2buff = wvc_buffer;
-        wpc->stream.block2end = wvc_buffer + sizeof (wv_buffer);
+        wpc->stream.block2end = wvc_buffer + sizeof (wvc_buffer);
     }
 
     return wpc;
