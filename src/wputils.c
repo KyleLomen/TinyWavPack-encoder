@@ -20,7 +20,7 @@
 // efficient down to just a few thousand samples.
 
 // This version of the code uses no dynamic memory allocation. Instead it
-// contains two output block buffers (one for wv data and one for wvc data)
+// contains an output block buffer (half for wv data and half for wvc data)
 // and one static WavpackContext structure. If this code is to be used for
 // multiple files at once then this must be modified.
 
@@ -41,15 +41,18 @@ const uint32_t sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000, 22050,
 
 ///////////////////////////// large static storage ////////////////////////////
 
-#define BIT_BUFFER_SIZE 65536   // This should be carefully chosen for the
-                                // application and platform. Larger buffers are
-                                // somewhat more efficient, but the code will
-                                // allow smaller buffers and simply terminate
-                                // blocks early. If the hybrid lossless mode
-                                // (2 file) is not needed then the wvc_buffer
-                                // can be made very small.
+#ifndef WAVPACK_BIT_BUFFER_SIZE
 
-static uchar wv_buffer [BIT_BUFFER_SIZE], wvc_buffer [BIT_BUFFER_SIZE];
+// This should be carefully chosen for the application and platform. Larger
+// buffers are somewhat more efficient, but the code will allow smaller buffers
+// and simply terminate blocks early. If the hybrid lossless mode (2 file) is 
+// used then the actual buffer size will be half of this value.
+
+#define WAVPACK_BIT_BUFFER_SIZE 65536
+
+#endif   
+
+static uchar wv_buffer [WAVPACK_BIT_BUFFER_SIZE];
 static WavpackContext wavpack_context;
 
 ///////////////////////////// executable code ////////////////////////////////
@@ -82,11 +85,14 @@ WavpackContext *WavpackOpenFileOutput (WavpackBlockOutput blockout, void *wv_id,
     wpc->wvc_out = wvc_id;
 
     wpc->stream.blockbuff = wv_buffer;
-    wpc->stream.blockend = wv_buffer + sizeof (wv_buffer);
 
     if (wvc_id) {
-        wpc->stream.block2buff = wvc_buffer;
-        wpc->stream.block2end = wvc_buffer + sizeof (wvc_buffer);
+        wpc->stream.blockend = wv_buffer + sizeof (wv_buffer) / 2;
+        wpc->stream.block2buff = wv_buffer + sizeof(wv_buffer) / 2;
+        wpc->stream.block2end = wv_buffer + sizeof (wv_buffer);
+    }
+    else {
+        wpc->stream.blockend = wv_buffer + sizeof (wv_buffer);
     }
 
     return wpc;
