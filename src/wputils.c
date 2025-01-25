@@ -84,15 +84,15 @@ WavpackContext *WavpackOpenFileOutput (WavpackBlockOutput blockout, void *wv_id,
     wpc->wv_out = wv_id;
     wpc->wvc_out = wvc_id;
 
-    wpc->stream.blockbuff = wv_buffer;
+    wpc->stream[0].blockbuff = wv_buffer;
 
     if (wvc_id) {
-        wpc->stream.blockend = wv_buffer + sizeof (wv_buffer) / 2;
-        wpc->stream.block2buff = wv_buffer + sizeof(wv_buffer) / 2;
-        wpc->stream.block2end = wv_buffer + sizeof (wv_buffer);
+        wpc->stream[0].blockend = wv_buffer + sizeof (wv_buffer) / 2;
+        wpc->stream[0].block2buff = wv_buffer + sizeof(wv_buffer) / 2;
+        wpc->stream[0].block2end = wv_buffer + sizeof (wv_buffer);
     }
     else {
-        wpc->stream.blockend = wv_buffer + sizeof (wv_buffer);
+        wpc->stream[0].blockend = wv_buffer + sizeof (wv_buffer);
     }
 
     return wpc;
@@ -142,7 +142,7 @@ WavpackContext *WavpackOpenFileOutput (WavpackBlockOutput blockout, void *wv_id,
 int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, uint32_t total_samples)
 {
     uint32_t flags = (config->bytes_per_sample - 1);
-    WavpackStream *wps = &wpc->stream;
+    WavpackStream *wps = wpc->stream;
     int bps = 0, shift, i;
 
     if (config->num_channels > 2) {
@@ -255,7 +255,7 @@ static int finish_block (WavpackContext *wpc);
 
 int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sample_count)
 {
-    WavpackStream *wps = &wpc->stream;
+    WavpackStream *wps = wpc->stream;
     int nch = wpc->config.num_channels;
     uint32_t flags = wps->wphdr.flags;
 
@@ -321,7 +321,7 @@ int WavpackFlushSamples (WavpackContext *wpc)
 
 static int finish_block (WavpackContext *wpc)
 {
-    WavpackStream *wps = &wpc->stream;
+    WavpackStream *wps = wpc->stream;
     uint32_t bcount;
     int result;
 
@@ -372,7 +372,7 @@ uint32_t WavpackGetNumSamples (WavpackContext *wpc)
 uint32_t WavpackGetSampleIndex (WavpackContext *wpc)
 {
     if (wpc)
-        return wpc->stream.sample_index;
+        return wpc->stream[0].sample_index;
 
     return (uint32_t) -1;
 }

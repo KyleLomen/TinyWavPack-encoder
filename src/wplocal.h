@@ -208,7 +208,9 @@ typedef struct bs {
     uint32_t sr;
 } Bitstream;
 
-#define MAX_STREAMS 1
+#ifndef WAVPACK_MAX_STREAMS
+#define WAVPACK_MAX_STREAMS 1
+#endif
 #define MAX_NTERMS 16
 #define MAX_TERM 8
 
@@ -261,7 +263,7 @@ typedef struct {
     uint32_t filelen, file2len, total_samples;
 
     int stream_version;
-    WavpackStream stream;
+    WavpackStream stream[WAVPACK_MAX_STREAMS];
 
     char error_message [80];
 } WavpackContext;

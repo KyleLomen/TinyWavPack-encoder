@@ -39,7 +39,7 @@ const signed char fast_terms [] =      { 18,17,0 };
 
 void pack_init (WavpackContext *wpc)
 {
-    WavpackStream *wps = &wpc->stream;
+    WavpackStream *wps = wpc->stream;
     uint32_t flags = wps->wphdr.flags;
     const signed char *term_string;
     struct decorr_pass *dpp;
@@ -303,7 +303,7 @@ static int copy_metadata (WavpackMetadata *wpmd, uchar *buffer_start, uchar *buf
 
 int pack_start_block (WavpackContext *wpc)
 {
-    WavpackStream *wps = &wpc->stream;
+    WavpackStream *wps = wpc->stream;
     uint32_t flags = wps->wphdr.flags;
     WavpackMetadata wpmd;
 
@@ -364,7 +364,7 @@ int pack_start_block (WavpackContext *wpc)
 
 uint32_t pack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_count)
 {
-    WavpackStream *wps = &wpc->stream;
+    WavpackStream *wps = wpc->stream;
     uint32_t flags = wps->wphdr.flags;
     int tcount, lossy = 0, m;
     struct decorr_pass *dpp;
@@ -686,7 +686,7 @@ uint32_t pack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_cou
 
 int pack_finish_block (WavpackContext *wpc)
 {
-    WavpackStream *wps = &wpc->stream;
+    WavpackStream *wps = wpc->stream;
     int lossy = wps->lossy_block, tcount, k, m;
     struct decorr_pass *dpp;
     uint32_t data_count;
